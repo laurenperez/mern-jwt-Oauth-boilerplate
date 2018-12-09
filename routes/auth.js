@@ -4,6 +4,7 @@ var router = express.Router();
 var mongoose = require('mongoose');
 var User = require('../models/user');
 var bcrypt = require('bcrypt');
+var passport = require('../config/passportConfig');
 
 var expressJWT = require('express-jwt');
 var jwt = require('jsonwebtoken');
@@ -89,5 +90,39 @@ router.post('/me/from/token', (req, res, next) => {
     })
   }
 })
+
+
+router.get('/google',
+  passport.authenticate('google', {
+    scope: ['https://www.googleapis.com/auth/plus.login'] }
+  )
+);
+
+
+router.get('/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
+  function(req, res){
+    res.redirect('/');
+  }
+);
+
+
+router.get('/user', function(req, res, next) {
+  if (req.user) {
+    return res.json({ user: req.user });
+  } else {
+    return res.json({ user: null });
+  }
+});
+
+
+router.get('/logout', function(req, res) {
+  req.logout();
+  res.redirect('/');
+})
+
+
+
+
 
 module.exports = router;

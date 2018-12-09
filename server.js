@@ -4,6 +4,9 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var session = require('express-session');
+var passport = require('./config/passportConfig');
+
 // Mongoose stuff
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/mernJwtAuth');
@@ -19,6 +22,16 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'client', 'build')));
+
+//adding passport sessions to this app for use with goole oAuth
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true
+}))
+app.use(passport.initialize());
+app.use(passport.session());
+
 
 // Do we still need this?
 app.use(function(req, res, next) {
